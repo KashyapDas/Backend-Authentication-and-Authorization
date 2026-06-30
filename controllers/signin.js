@@ -16,7 +16,7 @@ const signin = async (req,res)=>{
     const accessToken = jwt.sign(
         { userId: result._id},
         config.JWT_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "1m" }
     );
 
     const refreshToken = jwt.sign(
