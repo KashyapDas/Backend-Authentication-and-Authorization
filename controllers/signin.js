@@ -28,14 +28,14 @@ const signin = async (req,res)=>{
     // set the token in the cookie
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: false, // true in production (HTTPS)
+        secure: true, // true in production (HTTPS)
         sameSite: "strict",
         maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false, // true in production
+        secure: true, // true in production
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
