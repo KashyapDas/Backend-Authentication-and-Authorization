@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
+const encodedValue = require("../utils/encodeBcrypt");
+const deleteOldRefreshToken = require("../utils/deleteOldRefreshToken");
+const insertTokenInDB = require("../utils/insertTokenDB");
 
-const refreshToken = (req,res)=>{
+
+const refreshToken = async (req,res)=>{
     // get the refresh token
     const oldRefreshToken = req.cookies.refreshToken;
     if(!oldRefreshToken){
@@ -42,8 +46,18 @@ const refreshToken = (req,res)=>{
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000 
     });
+    // encode the new refresh token
+    const hashToken = await encodedValue(newRefreshToken);
+    // add the new encoded Refresh Token in the database after creating it
+    const insertTokenResult = await insertTokenInDB(hashToken, refreshTokenDecoded.userId);
+    if(!insertTokenResult){
+        return res.status(411).json({
+            msg : "Something went wrong...Plz try again later..."
+        });
+    }
+    // remove the oldRefreshToken from the database for that specfic user and newOne
+    await deleteOldRefreshToken(oldRefreshToken, refreshTokenDecoded.userId);
     
-
 
     res.json({
         msg : "Refresh token router..."
